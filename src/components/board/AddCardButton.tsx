@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Plus } from 'lucide-react';
 import { Dialog } from '@/components/ui/dialog';
+import { isValidCardTitle } from '@/lib/validation';
 import { useBoardStore } from '@/store/board.store';
 import type { Member, Priority } from '@/types/board.types';
 
@@ -18,6 +19,7 @@ export function AddCardButton({ columnId, members }: AddCardButtonProps) {
   const [priority, setPriority] = useState<Priority>('none');
   const [assigneeId, setAssigneeId] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [creationError, setCreationError] = useState<string | null>(null);
 
   const reset = () => {
     setTitle('');
@@ -25,16 +27,19 @@ export function AddCardButton({ columnId, members }: AddCardButtonProps) {
     setPriority('none');
     setAssigneeId('');
     setDueDate('');
+    setCreationError(null);
   };
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!title.trim()) {
+    const safeTitle = title.trim();
+    if (!isValidCardTitle(safeTitle)) {
+      setCreationError('El titulo de la tarjeta es obligatorio.');
       return;
     }
 
-    addCard(columnId, {
-      title: title.trim(),
+    const createdCardId = addCard(columnId, {
+      title: safeTitle,
       description: description.trim() || 'Descripcion pendiente.',
       assigneeId: assigneeId || null,
       priority,
@@ -44,6 +49,11 @@ export function AddCardButton({ columnId, members }: AddCardButtonProps) {
       attachments: 0,
       comments: 0
     });
+
+    if (!createdCardId) {
+      setCreationError('No se pudo crear la tarjeta. Verifica los datos e intenta de nuevo.');
+      return;
+    }
 
     setOpen(false);
     reset();
@@ -75,12 +85,23 @@ export function AddCardButton({ columnId, members }: AddCardButtonProps) {
             <input
               autoFocus
               value={title}
-              onChange={(event) => setTitle(event.target.value)}
+              onChange={(event) => {
+                setTitle(event.target.value);
+                if (creationError) {
+                  setCreationError(null);
+                }
+              }}
               className="rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-cyan-500"
               placeholder="Ejemplo: Ajustar validacion de login"
               required
             />
           </label>
+
+          {creationError ? (
+            <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700">
+              {creationError}
+            </p>
+          ) : null}
 
           <label className="grid gap-1 text-sm font-semibold text-slate-700">
             Descripcion
@@ -92,13 +113,13 @@ export function AddCardButton({ columnId, members }: AddCardButtonProps) {
             />
           </label>
 
-          <div className="grid gap-2 sm:grid-cols-3">
-            <label className="grid gap-1 text-sm font-semibold text-slate-700">
+          <div className="grid gap-2 sm:grid-cols-2">
+            <label className="grid min-w-0 gap-1 text-sm font-semibold text-slate-700">
               Prioridad
               <select
                 value={priority}
                 onChange={(event) => setPriority(event.target.value as Priority)}
-                className="rounded-xl border border-slate-300 px-2 py-2 text-sm"
+                className="w-full rounded-xl border border-slate-300 px-2 py-2 text-sm"
               >
                 <option value="none">Sin prioridad</option>
                 <option value="low">Baja</option>
@@ -108,12 +129,12 @@ export function AddCardButton({ columnId, members }: AddCardButtonProps) {
               </select>
             </label>
 
-            <label className="grid gap-1 text-sm font-semibold text-slate-700">
+            <label className="grid min-w-0 gap-1 text-sm font-semibold text-slate-700">
               Responsable
               <select
                 value={assigneeId}
                 onChange={(event) => setAssigneeId(event.target.value)}
-                className="rounded-xl border border-slate-300 px-2 py-2 text-sm"
+                className="w-full rounded-xl border border-slate-300 px-2 py-2 text-sm"
               >
                 <option value="">Sin asignar</option>
                 {members.map((member) => (
@@ -124,13 +145,13 @@ export function AddCardButton({ columnId, members }: AddCardButtonProps) {
               </select>
             </label>
 
-            <label className="grid gap-1 text-sm font-semibold text-slate-700">
+            <label className="grid min-w-0 gap-1 text-sm font-semibold text-slate-700 sm:col-span-2">
               Fecha limite
               <input
                 type="date"
                 value={dueDate}
                 onChange={(event) => setDueDate(event.target.value)}
-                className="rounded-xl border border-slate-300 px-2 py-2 text-sm"
+                className="w-full rounded-xl border border-slate-300 px-2 py-2 text-sm"
               />
             </label>
           </div>

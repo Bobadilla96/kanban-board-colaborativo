@@ -3,7 +3,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { MOCK_BOARDS } from '@/data/boards.mock';
 import { generateId } from '@/lib/id';
 import { getSafeStorage } from '@/lib/storage';
-import { isValidName, sanitizeText } from '@/lib/validation';
+import { isValidCardTitle, isValidName, sanitizeText } from '@/lib/validation';
 import type { Board, Card, Column, NewBoardInput, NewCardInput } from '@/types/board.types';
 
 type NewColumnInput = {
@@ -243,7 +243,7 @@ export const useBoardStore = create<BoardState>()(
 
       addCard: (columnId, cardInput) => {
         const safeTitle = sanitizeText(cardInput.title);
-        if (!isValidName(safeTitle)) {
+        if (!isValidCardTitle(safeTitle)) {
           return null;
         }
 
@@ -292,7 +292,7 @@ export const useBoardStore = create<BoardState>()(
                 }
 
                 const nextTitle =
-                  typeof updates.title === 'string' && isValidName(updates.title)
+                  typeof updates.title === 'string' && isValidCardTitle(updates.title)
                     ? sanitizeText(updates.title)
                     : card.title;
                 const nextDescription =
