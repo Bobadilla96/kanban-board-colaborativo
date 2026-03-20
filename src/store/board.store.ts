@@ -63,7 +63,7 @@ const sanitizeDescription = (value: string): string => sanitizeText(value || '')
 
 export const useBoardStore = create<BoardState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       ...getInitialState(),
 
       setActiveBoard: (id) =>
@@ -150,9 +150,15 @@ export const useBoardStore = create<BoardState>()(
           return null;
         }
 
+        const activeBoardId = get().activeBoardId;
+        const activeBoard = get().boards.find((board) => board.id === activeBoardId);
+        if (!activeBoard) {
+          return null;
+        }
+
         const columnId = generateId('col');
         set((state) => ({
-          boards: updateBoardById(state.boards, state.activeBoardId, (board) => ({
+          boards: updateBoardById(state.boards, activeBoardId, (board) => ({
             ...board,
             updatedAt: nowIso(),
             columns: [
@@ -247,9 +253,20 @@ export const useBoardStore = create<BoardState>()(
           return null;
         }
 
+        const activeBoardId = get().activeBoardId;
+        const activeBoard = get().boards.find((board) => board.id === activeBoardId);
+        if (!activeBoard) {
+          return null;
+        }
+
+        const targetColumn = activeBoard.columns.find((column) => column.id === columnId);
+        if (!targetColumn) {
+          return null;
+        }
+
         const cardId = generateId('card');
         set((state) => ({
-          boards: updateBoardById(state.boards, state.activeBoardId, (board) => ({
+          boards: updateBoardById(state.boards, activeBoardId, (board) => ({
             ...board,
             updatedAt: nowIso(),
             columns: board.columns.map((column) => {

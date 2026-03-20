@@ -88,4 +88,20 @@ describe('board store', () => {
     expect(sourceStillContains).toBe(false);
     expect(movedCard.activity.length).toBe(previousActivityCount + 1);
   });
+
+  it('returns null when adding a card to an invalid column', () => {
+    const result = useBoardStore.getState().addCard('missing-column', {
+      title: 'Nueva tarea',
+      description: 'desc',
+      assigneeId: null,
+      priority: 'none',
+      labels: [],
+      dueDate: null,
+      checklist: [],
+      attachments: 0,
+      comments: 0
+    });
+
+    expect(result).toBeNull();
+  });
 });
