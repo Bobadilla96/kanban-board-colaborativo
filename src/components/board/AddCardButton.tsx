@@ -113,13 +113,13 @@ export function AddCardButton({ columnId, members }: AddCardButtonProps) {
             />
           </label>
 
-          <div className="grid gap-2 sm:grid-cols-2">
+          <div className="grid gap-2">
             <label className="grid min-w-0 gap-1 text-sm font-semibold text-slate-700">
               Prioridad
               <select
                 value={priority}
                 onChange={(event) => setPriority(event.target.value as Priority)}
-                className="w-full rounded-xl border border-slate-300 px-2 py-2 text-sm"
+                className="min-w-0 w-full rounded-xl border border-slate-300 px-2 py-2 text-sm"
               >
                 <option value="none">Sin prioridad</option>
                 <option value="low">Baja</option>
@@ -134,7 +134,7 @@ export function AddCardButton({ columnId, members }: AddCardButtonProps) {
               <select
                 value={assigneeId}
                 onChange={(event) => setAssigneeId(event.target.value)}
-                className="w-full rounded-xl border border-slate-300 px-2 py-2 text-sm"
+                className="min-w-0 w-full rounded-xl border border-slate-300 px-2 py-2 text-sm"
               >
                 <option value="">Sin asignar</option>
                 {members.map((member) => (
@@ -145,13 +145,13 @@ export function AddCardButton({ columnId, members }: AddCardButtonProps) {
               </select>
             </label>
 
-            <label className="grid min-w-0 gap-1 text-sm font-semibold text-slate-700 sm:col-span-2">
+            <label className="grid min-w-0 gap-1 text-sm font-semibold text-slate-700">
               Fecha limite
               <input
                 type="date"
                 value={dueDate}
                 onChange={(event) => setDueDate(event.target.value)}
-                className="w-full rounded-xl border border-slate-300 px-2 py-2 text-sm"
+                className="min-w-0 w-full rounded-xl border border-slate-300 px-2 py-2 text-sm"
               />
             </label>
           </div>
